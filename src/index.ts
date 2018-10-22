@@ -69,6 +69,18 @@ export const verify = (
 
     return decodedPayload.mapLeft(() => new jwt.JsonWebTokenError(PathReporter.report(decodedPayload).join(', ')))
   } catch (err) {
-    return left(err)
+    if (isVerifyError(err)) {
+      return left(err)
+    }
+
+    return left(new jwt.JsonWebTokenError(err.message, err))
   }
 }
+
+/**
+ * Returns `true` if err is a `VerifyError`, `false` otherwise
+ * @param {Error} err
+ * @returns {Boolean} Whether err is a `VerifyError` or not
+ */
+export const isVerifyError = (err: Error): err is VerifyError =>
+  err instanceof jwt.TokenExpiredError || err instanceof jwt.JsonWebTokenError || err instanceof jwt.NotBeforeError

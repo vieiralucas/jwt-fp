@@ -1,5 +1,4 @@
-import { JsonWebTokenError, sign, TokenExpiredError, verify } from '../'
-import { NotBeforeError } from 'jsonwebtoken'
+import { isVerifyError, JsonWebTokenError, NotBeforeError, sign, TokenExpiredError, verify } from '../'
 
 test('sign and verify', () => {
   const payload = { foo: 'bar' }
@@ -59,4 +58,20 @@ test('sign and verify before nbf gives a left(NotBeforeError)', () => {
   }
 
   expect(decoded.value).toBeInstanceOf(NotBeforeError)
+})
+
+test('isVerifyError returns true when getting a JsonWebTokenError', () => {
+  expect(isVerifyError(new JsonWebTokenError('JsonWebTokenError'))).toBeTruthy()
+})
+
+test('isVerifyError returns true when getting a NotBeforeError', () => {
+  expect(isVerifyError(new NotBeforeError('NotBeforeError', new Date()))).toBeTruthy()
+})
+
+test('isVerifyError returns true when getting a TokenExpiredError', () => {
+  expect(isVerifyError(new TokenExpiredError('TokenExpiredError', 1))).toBeTruthy()
+})
+
+test('isVerifyError returns false when getting another type of Error', () => {
+  expect(isVerifyError(new Error('not a verify error'))).toBeFalsy()
 })
