@@ -36,7 +36,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^23.3.5",
-    "@types/jsonwebtoken": "^7.2.8",
+    "@types/jsonwebtoken": "^8.3.0",
     "coveralls": "^3.0.2",
     "jest": "^23.6.0",
     "prettier": "^1.14.3",
