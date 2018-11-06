@@ -13,7 +13,8 @@
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "coveralls": "jest --coverage --config jestconfig.json && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.5",
     "@types/jsonwebtoken": "^7.2.8",
+    "coveralls": "^3.0.2",
     "jest": "^23.6.0",
     "prettier": "^1.14.3",
     "ts-jest": "^23.10.4",
