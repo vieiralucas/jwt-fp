@@ -69,7 +69,7 @@ test('isVerifyError returns true when getting a NotBeforeError', () => {
 })
 
 test('isVerifyError returns true when getting a TokenExpiredError', () => {
-  expect(isVerifyError(new TokenExpiredError('TokenExpiredError', 1))).toBeTruthy()
+  expect(isVerifyError(new TokenExpiredError('TokenExpiredError', new Date(1)))).toBeTruthy()
 })
 
 test('isVerifyError returns false when getting another type of Error', () => {
