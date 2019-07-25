@@ -1,4 +1,7 @@
-import { isVerifyError, JsonWebTokenError, NotBeforeError, sign, TokenExpiredError, verify } from '../'
+import * as ET from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
+
+import { JsonWebTokenError, NotBeforeError, TokenExpiredError, isVerifyError, sign, verify } from '../'
 
 test('sign and verify', () => {
   const payload = { foo: 'bar' }
@@ -7,12 +10,12 @@ test('sign and verify', () => {
   const token = sign({ iat: 1, exp: Date.now() + 11000, nbf: 1, data: payload }, secret)
   const decoded = verify(token, secret)
 
-  if (decoded.isLeft()) {
-    expect(decoded.isLeft()).toBeFalsy()
-    return
-  }
-
-  expect(decoded.value.data).toEqual(payload)
+  expect(
+    pipe(
+      decoded,
+      ET.map(({ data }) => data),
+    ),
+  ).toEqual(ET.right(payload))
 })
 
 test('sign and verify with invalid secret should give a left(JsonWebTokenError)', () => {
@@ -22,12 +25,7 @@ test('sign and verify with invalid secret should give a left(JsonWebTokenError)'
   const token = sign({ data: payload }, secret)
   const decoded = verify(token, secret + 'nops')
 
-  if (decoded.isRight()) {
-    expect(decoded.isRight()).toBeFalsy()
-    return
-  }
-
-  expect(decoded.value).toBeInstanceOf(JsonWebTokenError)
+  expect(decoded).toEqual(ET.left(new JsonWebTokenError('invalid signature')))
 })
 
 test('sign and verify with expired token should give a left(TokenExpiredError)', () => {
@@ -37,12 +35,7 @@ test('sign and verify with expired token should give a left(TokenExpiredError)',
   const token = sign({ exp: 1, data: payload }, secret)
   const decoded = verify(token, secret)
 
-  if (decoded.isRight()) {
-    expect(decoded.isRight()).toBeFalsy()
-    return
-  }
-
-  expect(decoded.value).toBeInstanceOf(TokenExpiredError)
+  expect(decoded).toEqual(ET.left(new TokenExpiredError('jwt expired', new Date())))
 })
 
 test('sign and verify before nbf gives a left(NotBeforeError)', () => {
@@ -52,12 +45,7 @@ test('sign and verify before nbf gives a left(NotBeforeError)', () => {
   const token = sign({ nbf: Date.now() + 10000, data: payload }, secret)
   const decoded = verify(token, secret)
 
-  if (decoded.isRight()) {
-    expect(decoded.isRight()).toBeFalsy()
-    return
-  }
-
-  expect(decoded.value).toBeInstanceOf(NotBeforeError)
+  expect(decoded).toEqual(ET.left(new NotBeforeError('jwt not active', new Date())))
 })
 
 test('isVerifyError returns true when getting a JsonWebTokenError', () => {

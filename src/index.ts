@@ -1,4 +1,4 @@
-import { Either, left } from 'fp-ts/lib/Either'
+import { Either, left, mapLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as jwt from 'jsonwebtoken'
@@ -67,7 +67,7 @@ export const verify = (
     const decodedToken = jwt.verify(token, secretOrPublicKey, options)
     const decodedPayload = VerifyPayload.decode(decodedToken)
 
-    return decodedPayload.mapLeft(() => new jwt.JsonWebTokenError(PathReporter.report(decodedPayload).join(', ')))
+    return mapLeft(() => new jwt.JsonWebTokenError(PathReporter.report(decodedPayload).join(', ')))(decodedPayload)
   } catch (err) {
     if (isVerifyError(err)) {
       return left(err)
