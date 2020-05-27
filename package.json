@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "fp-ts": "^2.0.3",
-    "io-ts": "^2.0.0",
+    "io-ts": "^2.2.4",
     "jsonwebtoken": "^8.5.0"
   }
 }
